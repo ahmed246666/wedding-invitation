@@ -120,6 +120,12 @@ document.getElementById('calBtn').target = '_blank';
   const hero = document.querySelector('.hero');
   if (!hero) return;
 
+  /* iOS Safari often glitches blend modes over video and limits autoplay.
+     We toggle a CSS hook and keep playback to the active page only. */
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS) document.documentElement.classList.add('is-ios');
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mobileQuery = window.matchMedia('(max-width: 760px)');
 
@@ -203,6 +209,59 @@ document.getElementById('calBtn').target = '_blank';
 
   /* show content even if the video is slow or blocked */
   setTimeout(markReady, 4000);
+})();
+
+/* ---------- BACKGROUND VIDEO POLICY (iOS-friendly) ---------- */
+(function(){
+  const pagesEl = document.getElementById('pages');
+  const pageEls = Array.from(document.querySelectorAll('.page'));
+  if (!pagesEl || pageEls.length === 0) return;
+
+  function setInlineSafe(video){
+    if (!video) return;
+    video.muted = true;                 // required for autoplay on iOS
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('muted', '');
+  }
+
+  function setPageVideosActive(activeIdx){
+    pageEls.forEach((page, idx) => {
+      const vids = Array.from(page.querySelectorAll('video.hero-video'));
+      vids.forEach(v => {
+        setInlineSafe(v);
+        if (idx === activeIdx){
+          v.preload = 'auto';
+          const p = v.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        } else {
+          v.preload = 'none';
+          try { v.pause(); } catch {}
+        }
+      });
+    });
+  }
+
+  function pageHeight(){
+    return pageEls[0].offsetHeight || window.innerHeight;
+  }
+
+  let lastActive = -1;
+  function computeActiveIndex(){
+    return Math.max(0, Math.min(pageEls.length - 1, Math.round(pagesEl.scrollTop / pageHeight())));
+  }
+
+  function syncActive(){
+    const idx = computeActiveIndex();
+    if (idx === lastActive) return;
+    lastActive = idx;
+    setPageVideosActive(idx);
+  }
+
+  // Initial and ongoing sync.
+  syncActive();
+  pagesEl.addEventListener('scroll', () => requestAnimationFrame(syncActive), { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(syncActive));
 })();
 
 /* ---------- COMMENT FORM ---------- */

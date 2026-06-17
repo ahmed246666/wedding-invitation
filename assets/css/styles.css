@@ -80,6 +80,7 @@ section{position:relative;z-index:1;padding:64px 22px}
   align-items:center;justify-content:center;text-align:center;
   padding:120px 22px 80px;position:relative;overflow:hidden;
   background:var(--ink);
+  isolation:isolate;
 }
 .hero-video{
   position:absolute;inset:0;width:100%;height:100%;
@@ -203,6 +204,7 @@ section{position:relative;z-index:1;padding:64px 22px}
   padding:64px 22px;
   position:relative;overflow:hidden;
   background:var(--ink);
+  isolation:isolate;
 }
 .split-section .section-title{color:var(--ivory)}
 .split-section .invite-cols,
@@ -238,6 +240,11 @@ section{position:relative;z-index:1;padding:64px 22px}
   height:auto;
   margin:0 auto 18px;
   mix-blend-mode:screen;
+}
+
+/* iOS Safari: blend modes over video layers can render as "missing" */
+.is-ios .invite-blessing-img{
+  mix-blend-mode:normal;
 }
 .invite-cols{
   gap:0 20px;margin:0 auto 0px;direction:rtl;
