@@ -17,6 +17,10 @@
      STYLES
      ============================================================ -->
 <link rel="stylesheet" href="assets/css/styles.css" />
+
+<!-- preload hero video for the current viewport -->
+<link rel="preload" as="video" href="assets/media/web_view.mp4" type="video/mp4" media="(min-width: 761px)" />
+<link rel="preload" as="video" href="assets/media/mobile_view.mp4" type="video/mp4" media="(max-width: 760px)" />
 </head>
 
 <body>
@@ -26,9 +30,10 @@
   <!-- ==================== PAGE 1 : HERO ==================== -->
   <div class="page" id="page-0">
     <header class="hero">
-      <video class="hero-video hero-video--web" src="assets/media/web_view.mp4" autoplay muted loop playsinline></video>
-      <video class="hero-video hero-video--mobile" src="assets/media/mobile_view.mp4" autoplay muted loop playsinline></video>
+      <video class="hero-video hero-video--web" src="assets/media/web_view.mp4" autoplay muted loop playsinline preload="auto"></video>
+      <video class="hero-video hero-video--mobile" src="assets/media/mobile_view.mp4" autoplay muted loop playsinline preload="auto"></video>
 
+      <div class="hero-content">
       <p class="eyebrow">𝐘𝐨𝐮 𝐚𝐫𝐞 𝐢𝐧𝐯𝐢𝐭𝐞𝐝 𝐭𝐨 𝐨𝐮𝐫<br>𝐊𝐚𝐭𝐛 𝐊𝐞𝐭𝐚𝐛</p>
 
       <h1 class="couple">
@@ -44,14 +49,15 @@
       </div>
 
       <p class="hero-date">Friday | 26 - 6 - 2026</p>
+      </div>
     </header>
   </div>
 
   <!-- ==================== PAGE 2 : COUNTDOWN + INVITE ==================== -->
   <div class="page" id="page-1">
     <section class="split-section">
-      <video class="hero-video hero-video--web" src="assets/media/web_view.mp4" autoplay muted loop playsinline></video>
-      <video class="hero-video hero-video--mobile" src="assets/media/mobile_view.mp4" autoplay muted loop playsinline></video>
+      <video class="hero-video hero-video--web" src="assets/media/web_view.mp4" autoplay muted loop playsinline preload="none"></video>
+      <video class="hero-video hero-video--mobile" src="assets/media/mobile_view.mp4" autoplay muted loop playsinline preload="none"></video>
       <div class="wrap split-wrap">
 
         <!-- LEFT: countdown -->

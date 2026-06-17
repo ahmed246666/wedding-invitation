@@ -115,55 +115,94 @@ document.getElementById('calBtn').target = '_blank';
   revealPage(0);
 })();
 
-/* ---------- HERO WORD-BY-WORD ANIMATION ---------- */
+/* ---------- HERO VIDEO + WORD-BY-WORD ANIMATION ---------- */
 (function(){
   const hero = document.querySelector('.hero');
-  if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!hero) return;
 
-  const STAGGER = 0.22;
-  let idx = 0;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobileQuery = window.matchMedia('(max-width: 760px)');
 
-  function wordSpan(text){
-    const span = document.createElement('span');
-    span.className = 'hero-word';
-    span.style.setProperty('--word-delay', `${idx * STAGGER}s`);
-    span.textContent = text;
-    idx++;
-    return span;
+  function activeVideo(){
+    return hero.querySelector(mobileQuery.matches ? '.hero-video--mobile' : '.hero-video--web');
   }
 
-  function splitText(el){
-    [...el.childNodes].forEach(child => {
-      if (child.nodeType === Node.TEXT_NODE){
-        const frag = document.createDocumentFragment();
-        child.textContent.split(/(\s+)/).forEach(part => {
-          if (/^\s+$/.test(part)) frag.appendChild(document.createTextNode(part));
-          else if (part) frag.appendChild(wordSpan(part));
-        });
-        el.replaceChild(frag, child);
-      } else if (child.nodeType === Node.ELEMENT_NODE){
-        if (child.tagName === 'BR') return;
-        if (child.classList.contains('amp')){
-          const span = wordSpan(child.textContent.trim());
-          span.classList.add('amp');
-          el.replaceChild(span, child);
-        } else {
-          splitText(child);
+  function initHeroAnimation(){
+    if (reducedMotion) return;
+
+    const STAGGER = 0.22;
+    let idx = 0;
+
+    function wordSpan(text){
+      const span = document.createElement('span');
+      span.className = 'hero-word';
+      span.style.setProperty('--word-delay', `${idx * STAGGER}s`);
+      span.textContent = text;
+      idx++;
+      return span;
+    }
+
+    function splitText(el){
+      [...el.childNodes].forEach(child => {
+        if (child.nodeType === Node.TEXT_NODE){
+          const frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach(part => {
+            if (/^\s+$/.test(part)) frag.appendChild(document.createTextNode(part));
+            else if (part) frag.appendChild(wordSpan(part));
+          });
+          el.replaceChild(frag, child);
+        } else if (child.nodeType === Node.ELEMENT_NODE){
+          if (child.tagName === 'BR') return;
+          if (child.classList.contains('amp')){
+            const span = wordSpan(child.textContent.trim());
+            span.classList.add('amp');
+            el.replaceChild(span, child);
+          } else {
+            splitText(child);
+          }
         }
-      }
+      });
+    }
+
+    ['.eyebrow', '.couple', '.hero-date'].forEach(sel => {
+      const el = hero.querySelector(sel);
+      if (el) splitText(el);
     });
+
+    const ornament = hero.querySelector('.ornament');
+    if (ornament){
+      ornament.classList.add('hero-reveal');
+      ornament.style.setProperty('--word-delay', `${idx * STAGGER}s`);
+    }
   }
 
-  ['.eyebrow', '.couple', '.hero-date'].forEach(sel => {
-    const el = hero.querySelector(sel);
-    if (el) splitText(el);
-  });
-
-  const ornament = hero.querySelector('.ornament');
-  if (ornament){
-    ornament.classList.add('hero-reveal');
-    ornament.style.setProperty('--word-delay', `${idx * STAGGER}s`);
+  function markReady(){
+    if (hero.classList.contains('hero--ready')) return;
+    hero.classList.add('hero--ready');
+    initHeroAnimation();
   }
+
+  if (reducedMotion){
+    markReady();
+    return;
+  }
+
+  const video = activeVideo();
+  if (!video){
+    markReady();
+    return;
+  }
+
+  const inactive = hero.querySelector(mobileQuery.matches ? '.hero-video--web' : '.hero-video--mobile');
+  if (inactive) inactive.preload = 'none';
+
+  if (video.readyState >= 3) markReady();
+  else video.addEventListener('canplay', markReady, { once: true });
+
+  video.play().catch(() => {});
+
+  /* show content even if the video is slow or blocked */
+  setTimeout(markReady, 4000);
 })();
 
 /* ---------- COMMENT FORM ---------- */
