@@ -330,6 +330,7 @@ section{position:relative;z-index:1;padding:64px 22px}
    DETAILS / VENUE + MAP
    ============================================================ */
 .btn-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+.venue .btn-row{justify-content:flex-start}
 
 /* ---- Venue with bleeding / faded photo background ---- */
 .venue{
@@ -374,6 +375,12 @@ section{position:relative;z-index:1;padding:64px 22px}
 .btn.ghost{background:transparent;color:var(--coral-deep);box-shadow:none}
 .btn.ghost:hover{background:var(--coral);color:#fff}
 .btn svg{width:18px;height:18px}
+
+.venue .btn{
+  padding:12px 22px;
+  font-size:13px;
+}
+.venue .btn svg{width:16px;height:16px}
 
 
 /* ============================================================
@@ -664,6 +671,8 @@ footer .footer-date .date-sep{
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+
+/* ---- Tablets & large phones (≤760px) ---- */
 @media(max-width:760px){
   body{font-size:17px}
   .venue{min-height:0}
@@ -677,4 +686,72 @@ footer .footer-date .date-sep{
   .page-nav-btn svg{width:17px;height:17px}
   .page .comments{padding:36px 18px 56px}
   .comments-wrap{max-width:none}
+}
+
+/* ---- Standard phones (≤600px) ---- */
+@media(max-width:600px){
+  section{padding:48px 20px}
+  .eyebrow{font-size:18px;letter-spacing:.26em;margin-bottom:14px}
+  .ornament{margin:20px auto}
+  .ornament::before,.ornament::after{width:54px}
+  .ornament svg{width:24px;height:24px}
+  .hero{padding:100px 20px 70px}
+  .hero .eyebrow{margin-bottom:18px}
+  .hero-sub{margin-top:20px}
+  .hero-date{margin-top:24px}
+  .countdown{gap:8px;margin:8px auto 24px}
+  .count-box{border-radius:12px;padding:10px 3px}
+  .count-num{font-size:clamp(26px,8vw,38px)}
+  .venue-bg{width:100%}
+  .venue-name{font-size:23px}
+  .venue-addr{font-size:17px}
+  .btn{padding:13px 24px;font-size:14px}
+  footer .couple-sm{font-size:34px}
+}
+
+/* ---- Small phones (≤400px) ---- */
+@media(max-width:400px){
+  body{font-size:16px}
+  section{padding:40px 16px}
+  .hero{padding:84px 16px 60px}
+  .eyebrow{font-size:16px;letter-spacing:.2em}
+  .ornament::before,.ornament::after{width:42px}
+  .ornament svg{width:22px;height:22px}
+  .countdown{gap:6px}
+  .count-box{padding:8px 2px;border-radius:10px}
+  .count-num{font-size:clamp(22px,9vw,30px)}
+  .count-label{font-size:8px;letter-spacing:.04em;margin-top:6px}
+  .invite-blessing-img{width:min(92%,300px)}
+  .venue .btn{width:auto;justify-content:flex-start}
+  .btn-row{gap:10px}
+  .venue-name{font-size:21px}
+  .venue-addr{font-size:16px}
+  footer .couple-sm{font-size:30px}
+}
+
+/* ---- Very small phones (≤340px) ---- */
+@media(max-width:340px){
+  .eyebrow{letter-spacing:.16em}
+  .countdown{gap:5px}
+  .count-num{font-size:clamp(20px,9.5vw,26px)}
+  .count-label{font-size:7px;letter-spacing:0}
+}
+
+/* ---- Landscape phones (short viewport) ---- */
+@media(max-height:560px) and (orientation:landscape){
+  .hero{padding:60px 22px 44px}
+  .scroll-cue{display:none}
+  .couple{font-size:clamp(36px,12vh,72px)}
+  .hero .eyebrow{margin-bottom:12px}
+  .hero-date{margin-top:16px}
+  .ornament{margin:14px auto}
+  .page .split-section{padding-top:16px;padding-bottom:16px}
+  .split-section{padding:24px 22px}
+  .countdown{margin:6px auto 14px}
+  .count-box{aspect-ratio:auto;min-height:0;padding:12px 6px}
+  .invite-blessing-img{width:min(70%,240px);margin-bottom:10px}
+  .invite-cols p{line-height:1.7;margin-bottom:8px;font-size:clamp(15px,2vw,20px)}
+  .page .comments{padding:28px 18px}
+  .comment-field{margin-bottom:14px}
+  .comment-field textarea{min-height:90px}
 }
