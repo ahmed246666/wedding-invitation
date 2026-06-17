@@ -41,6 +41,16 @@ body::before{
 
 img{display:block;max-width:100%}
 
+/* iOS Safari "data detectors" can auto-link dates/phones and turn them blue */
+a[x-apple-data-detectors],
+a[x-apple-data-detectors]:hover,
+a[x-apple-data-detectors]:active,
+a[x-apple-data-detectors]:visited{
+  color:inherit !important;
+  -webkit-text-fill-color:inherit !important;
+  text-decoration:none !important;
+}
+
 /* ============================================================
    SECTION SHELL
    ============================================================ */
@@ -329,8 +339,14 @@ section{position:relative;z-index:1;padding:64px 22px}
 }
 .venue-bg{
   position:absolute;top:0;bottom:0;right:0;width:62%;z-index:0;
-  background:url('../media/image.png') no-repeat center 60%;
-  background-size:cover;
+  overflow:hidden;
+}
+.venue-bg-img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:center 60%;
+  display:block;
 }
 /* dissolve the photo into the ivory page on the left, top and bottom */
 .venue-bg::after{
