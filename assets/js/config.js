@@ -3,9 +3,9 @@
    ============================================================ */
 const CONFIG = {
   // Katb Ketab date & time (local). Format: YEAR, MONTH(1-12), DAY, HOUR(24), MIN
-  date: { year:2026, month:6, day:26, hour:17, minute:0 },
+  date: { year:2026, month:6, day:26, hour:16, minute:30 },
   // event duration in hours (for calendar)
-  durationHours: 5,
+  durationHours: 1.5,
   // Venue
   venue: {
     name:"Al-Iman Mosque",
