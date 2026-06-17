@@ -5,6 +5,24 @@
 const d = CONFIG.date;
 const target = new Date(d.year, d.month - 1, d.day, d.hour, d.minute, 0);
 
+/* ---------- VIEWPORT HEIGHT (mobile / legacy fallback) ---------- */
+(function(){
+  function setVH(){
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  }
+  setVH();
+  window.addEventListener('resize', setVH);
+  window.addEventListener('orientationchange', () => setTimeout(setVH, 150));
+})();
+
+function pageHeight(){
+  const pagesEl = document.getElementById('pages');
+  if (pagesEl && pagesEl.clientHeight > 0) return pagesEl.clientHeight;
+  const firstPage = document.querySelector('.page');
+  if (firstPage && firstPage.offsetHeight > 0) return firstPage.offsetHeight;
+  return window.innerHeight;
+}
+
 /* ---------- COUNTDOWN ---------- */
 const cd = document.getElementById('countdown');
 const labels = {d:'Days',h:'Hours',m:'Minutes',s:'Seconds'};
@@ -49,6 +67,8 @@ document.getElementById('calBtn').target = '_blank';
   const DARK_PAGES = new Set([0, 1]);
 
   let cur = 0;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const smoothScroll = !reducedMotion && 'scrollBehavior' in document.documentElement.style;
 
   /* build dot buttons */
   pageEls.forEach((_, i) => {
@@ -58,10 +78,6 @@ document.getElementById('calBtn').target = '_blank';
     btn.addEventListener('click', () => goTo(i));
     dotsEl.appendChild(btn);
   });
-
-  function pageHeight(){
-    return pageEls[0].offsetHeight || window.innerHeight;
-  }
 
   function revealPage(idx){
     pageEls[idx].querySelectorAll('.reveal:not(.in)')
@@ -79,7 +95,9 @@ document.getElementById('calBtn').target = '_blank';
   function goTo(n){
     n = Math.max(0, Math.min(pageEls.length - 1, n));
     cur = n;
-    pagesEl.scrollTo({ top: n * pageHeight(), behavior: 'smooth' });
+    const top = n * pageHeight();
+    if (smoothScroll) pagesEl.scrollTo({ top, behavior: 'smooth' });
+    else pagesEl.scrollTop = top;
     sync();
     revealPage(n);
   }
@@ -240,10 +258,6 @@ document.getElementById('calBtn').target = '_blank';
         }
       });
     });
-  }
-
-  function pageHeight(){
-    return pageEls[0].offsetHeight || window.innerHeight;
   }
 
   let lastActive = -1;
