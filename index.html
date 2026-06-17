@@ -109,14 +109,54 @@
     </section>
   </div>
 
-  <!-- ==================== PAGE 4 : FOOTER ==================== -->
+  <!-- ==================== PAGE 4 : COMMENTS ==================== -->
   <div class="page" id="page-3">
-    <footer>
-      <div class="ornament"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 21s-7-4.35-9.5-8.5C.7 9.6 2.3 6 5.5 6 7.6 6 12 9 12 9s4.4-3 6.5-3c3.2 0 4.8 3.6 3 6.5C19 16.65 12 21 12 21z"/></svg></div>
-      <p class="couple-sm">آلاء ومحمد</p>
-      <p>We can't wait to celebrate with you</p>
-      <p class="footer-date" id="footerDate">26 - 6 - 2026</p>
-    </footer>
+    <section class="comments">
+      <div class="wrap comments-wrap">
+        <div class="reveal">
+          <p class="eyebrow">Share your wishes</p>
+          <h2 class="section-title">Leave Us a Comment</h2>
+          <div class="ornament">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z"/>
+            </svg>
+          </div>
+
+          <form class="comment-form" id="commentForm" novalidate>
+            <label class="comment-field" for="commentName">
+              <span class="field-label">Your name <span class="field-optional">(optional)</span></span>
+              <input type="text" id="commentName" name="name" autocomplete="name" maxlength="100" placeholder="Your name" />
+            </label>
+
+            <label class="comment-field" for="commentMessage">
+              <span class="field-label">Your message</span>
+              <textarea id="commentMessage" name="message" required maxlength="1000" rows="5" placeholder="Write your wishes here…"></textarea>
+            </label>
+
+            <!-- honeypot — hidden from humans, catches bots -->
+            <input type="text" id="commentHoneypot" name="website" class="comment-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+            <div class="btn-row comment-actions">
+              <button type="submit" class="btn" id="commentSubmit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                Send Message
+              </button>
+            </div>
+
+            <p class="comment-status" id="commentStatus" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="comment-thanks" id="commentThanks" hidden>
+            <div class="ornament">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M12 21s-7-4.35-9.5-8.5C.7 9.6 2.3 6 5.5 6 7.6 6 12 9 12 9s4.4-3 6.5-3c3.2 0 4.8 3.6 3 6.5C19 16.65 12 21 12 21z"/>
+              </svg>
+            </div>
+            <p class="comment-thanks-msg">Thank you — your message means a lot to us.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
 </div><!-- /.pages -->

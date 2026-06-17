@@ -14,5 +14,9 @@ const CONFIG = {
     mapsUrl:"https://maps.app.goo.gl/erNueTmoqtQAT7cA8"
   },
   // calendar event title
-  calendarTitle:"Katb Ketab of Alaa and Mohamed"
+  calendarTitle:"Katb Ketab of Alaa and Mohamed",
+  // Google Apps Script web app URL (see scripts/comments-apps-script.gs)
+  commentsScriptUrl:"https://script.google.com/macros/s/AKfycbxtHkm-99PuewElGPBFFlbt-VOvzoVf_9SwZmjGiR6Yn8eXr3Bo_0y3XNwC6kYIMsLMkQ/exec",
+  // optional shared secret — must match SECRET in the Apps Script
+  commentsSecret:""
 };

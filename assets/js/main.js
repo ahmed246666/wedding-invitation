@@ -5,14 +5,6 @@
 const d = CONFIG.date;
 const target = new Date(d.year, d.month - 1, d.day, d.hour, d.minute, 0);
 
-/* ---------- FOOTER DATE ---------- */
-function formatDateHtml(day, month, year){
-  const num = n => `<span class="date-num">${n}</span>`;
-  const sep = `<span class="date-sep">–</span>`;
-  return num(day) + sep + num(month) + sep + num(year);
-}
-document.getElementById('footerDate').innerHTML = formatDateHtml(d.day, d.month, d.year);
-
 /* ---------- COUNTDOWN ---------- */
 const cd = document.getElementById('countdown');
 const labels = {d:'Days',h:'Hours',m:'Minutes',s:'Seconds'};
@@ -53,8 +45,8 @@ document.getElementById('calBtn').target = '_blank';
   const dotsEl    = document.getElementById('pageDots');
   const pageNavEl = document.getElementById('pageNav');
 
-  /* pages 0 (hero), 1 (split), and last (footer) have dark backgrounds */
-  const DARK_PAGES = new Set([0, 1, pageEls.length - 1]);
+  /* pages 0 (hero) and 1 (split) have dark backgrounds */
+  const DARK_PAGES = new Set([0, 1]);
 
   let cur = 0;
 
@@ -172,4 +164,66 @@ document.getElementById('calBtn').target = '_blank';
     ornament.classList.add('hero-reveal');
     ornament.style.setProperty('--word-delay', `${idx * STAGGER}s`);
   }
+})();
+
+/* ---------- COMMENT FORM ---------- */
+(function(){
+  const form    = document.getElementById('commentForm');
+  const thanks  = document.getElementById('commentThanks');
+  const status  = document.getElementById('commentStatus');
+  const submit  = document.getElementById('commentSubmit');
+  const nameEl  = document.getElementById('commentName');
+  const msgEl   = document.getElementById('commentMessage');
+  const trapEl  = document.getElementById('commentHoneypot');
+  if (!form) return;
+
+  function setStatus(msg, isError){
+    status.textContent = msg;
+    status.classList.toggle('is-error', !!isError);
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    setStatus('');
+
+    if (trapEl.value) return;
+
+    const message = msgEl.value.trim();
+    if (!message){
+      setStatus('Please write a message before sending.', true);
+      msgEl.focus();
+      return;
+    }
+
+    const scriptUrl = CONFIG.commentsScriptUrl;
+    if (!scriptUrl){
+      setStatus('Comments are not set up yet. Please try again later.', true);
+      return;
+    }
+
+    submit.disabled = true;
+    setStatus('Sending…');
+
+    try {
+      const res = await fetch(scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          name: nameEl.value.trim(),
+          message,
+          secret: CONFIG.commentsSecret || '',
+          website: trapEl.value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success){
+        throw new Error(data.error || 'Submission failed');
+      }
+      form.hidden = true;
+      thanks.hidden = false;
+    } catch {
+      setStatus('Something went wrong. Please try again.', true);
+      submit.disabled = false;
+    }
+  });
 })();

@@ -343,6 +343,96 @@ footer .footer-date .date-sep{
 }
 
 /* ============================================================
+   COMMENTS FORM
+   ============================================================ */
+.comments-wrap{
+  max-width:520px;
+  text-align:center;
+}
+.comments-wrap .section-title{margin-bottom:0}
+.comment-form{
+  margin-top:32px;
+  text-align:left;
+}
+.comment-field{
+  display:block;
+  margin-bottom:22px;
+}
+.field-label{
+  display:block;
+  font-size:13px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-bottom:10px;
+}
+.field-optional{
+  text-transform:none;
+  letter-spacing:0;
+  font-style:italic;
+  font-size:12px;
+  opacity:.75;
+}
+.comment-field input,
+.comment-field textarea{
+  width:100%;
+  font-family:var(--serif);
+  font-size:17px;
+  line-height:1.6;
+  color:var(--ink);
+  background:var(--ivory);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px 16px;
+  transition:border-color .22s, box-shadow .22s;
+  resize:vertical;
+}
+.comment-field input::placeholder,
+.comment-field textarea::placeholder{
+  color:rgba(107,96,81,.45);
+  font-style:italic;
+}
+.comment-field input:focus,
+.comment-field textarea:focus{
+  outline:none;
+  border-color:var(--coral);
+  box-shadow:0 0 0 3px rgba(207,96,41,.12);
+}
+.comment-field textarea{min-height:140px}
+.comment-honeypot{
+  position:absolute;
+  left:-9999px;
+  width:1px;
+  height:1px;
+  opacity:0;
+  pointer-events:none;
+}
+.comment-actions{
+  justify-content:center;
+  margin-top:8px;
+}
+.comment-actions .btn{width:100%;justify-content:center}
+.comment-status{
+  min-height:1.4em;
+  margin-top:16px;
+  text-align:center;
+  font-size:15px;
+  color:var(--coral-deep);
+}
+.comment-status.is-error{color:#9b3b28}
+.comment-thanks{
+  margin-top:36px;
+  text-align:center;
+}
+.comment-thanks-msg{
+  font-family:var(--display);
+  font-size:clamp(22px,4vw,28px);
+  color:var(--ink);
+  font-style:italic;
+  line-height:1.4;
+}
+
+/* ============================================================
    REVEAL ANIMATION
    ============================================================ */
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .9s ease, transform .9s ease}
@@ -397,6 +487,17 @@ footer .footer-date .date-sep{
   align-items:center;
   justify-content:center;
   padding:40px 22px;
+}
+
+/* Comments fills its page and centres content */
+.page .comments{
+  height:100%;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:48px 22px 64px;
+  background:var(--cream);
 }
 
 /* ============================================================
@@ -498,4 +599,6 @@ footer .footer-date .date-sep{
   .page-nav{right:12px}
   .page-nav-btn{width:38px;height:38px}
   .page-nav-btn svg{width:17px;height:17px}
+  .page .comments{padding:36px 18px 56px}
+  .comments-wrap{max-width:none}
 }
