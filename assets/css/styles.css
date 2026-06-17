@@ -116,6 +116,34 @@ section{position:relative;z-index:1;padding:64px 22px}
   .hero-video--web{display:none}
   .hero-video--mobile{display:block;object-fit:fill}
 }
+
+/* iOS: tap-to-unlock when Safari blocks muted autoplay */
+.video-unlock-overlay{
+  position:fixed;inset:0;z-index:1001;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  border:none;padding:0;margin:0;
+  background:rgba(59,51,41,.42);
+  color:var(--ivory);
+  font-family:var(--serif);
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  animation:unlockFadeIn .35s ease;
+}
+.video-unlock-overlay[hidden]{display:none}
+.video-unlock-icon{
+  width:64px;height:64px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.video-unlock-icon svg{width:28px;height:28px;margin-left:4px}
+.video-unlock-label{
+  font-size:13px;letter-spacing:.22em;text-transform:uppercase;
+  text-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+@keyframes unlockFadeIn{from{opacity:0}to{opacity:1}}
+
 /* lift all hero content above video */
 .hero > *:not(.hero-video),
 .split-section > *:not(.hero-video){position:relative;z-index:2}

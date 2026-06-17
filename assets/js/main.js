@@ -133,16 +133,15 @@ document.getElementById('calBtn').target = '_blank';
   revealPage(0);
 })();
 
+/* ---------- iOS detect (blend-mode fix + video unlock UI) ---------- */
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '')
+  || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+if (isIOS) document.documentElement.classList.add('is-ios');
+
 /* ---------- HERO VIDEO + WORD-BY-WORD ANIMATION ---------- */
 (function(){
   const hero = document.querySelector('.hero');
   if (!hero) return;
-
-  /* iOS Safari often glitches blend modes over video and limits autoplay.
-     We toggle a CSS hook and keep playback to the active page only. */
-  const ua = navigator.userAgent || '';
-  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (isIOS) document.documentElement.classList.add('is-ios');
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mobileQuery = window.matchMedia('(max-width: 760px)');
@@ -223,44 +222,92 @@ document.getElementById('calBtn').target = '_blank';
   if (video.readyState >= 3) markReady();
   else video.addEventListener('canplay', markReady, { once: true });
 
-  video.play().catch(() => {});
-
   /* show content even if the video is slow or blocked */
   setTimeout(markReady, 4000);
 })();
 
-/* ---------- BACKGROUND VIDEO POLICY (iOS-friendly) ---------- */
+/* ---------- BACKGROUND VIDEOS (autoplay + iOS tap-to-unlock) ---------- */
 (function(){
   const pagesEl = document.getElementById('pages');
   const pageEls = Array.from(document.querySelectorAll('.page'));
   if (!pagesEl || pageEls.length === 0) return;
 
-  function setInlineSafe(video){
-    if (!video) return;
-    video.muted = true;                 // required for autoplay on iOS
-    video.playsInline = true;
-    video.setAttribute('playsinline', '');
-    video.setAttribute('muted', '');
+  const mobileQuery = window.matchMedia('(max-width: 760px)');
+  let userUnlocked = false;
+  let lastActive = -1;
+  let overlayEl = null;
+
+  function visibleVideo(page){
+    const selector = mobileQuery.matches ? '.hero-video--mobile' : '.hero-video--web';
+    return page.querySelector(selector);
   }
 
-  function setPageVideosActive(activeIdx){
+  function setInlineSafe(video){
+    if (!video) return;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+    video.controls = false;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('muted', '');
+    video.removeAttribute('controls');
+  }
+
+  function playVideo(video){
+    if (!video) return Promise.resolve();
+    setInlineSafe(video);
+    const attempt = video.play();
+    return attempt && typeof attempt.then === 'function' ? attempt : Promise.resolve();
+  }
+
+  function showUnlockUI(){
+    if (userUnlocked || !isIOS) return;
+    document.documentElement.classList.add('needs-video-unlock');
+    if (overlayEl) overlayEl.hidden = false;
+  }
+
+  function hideUnlockUI(){
+    document.documentElement.classList.remove('needs-video-unlock');
+    if (overlayEl) overlayEl.hidden = true;
+  }
+
+  function checkActiveVideoPaused(){
+    if (userUnlocked) return;
+    const idx = computeActiveIndex();
+    const video = visibleVideo(pageEls[idx]);
+    if (video && video.paused && video.readyState >= 2) showUnlockUI();
+  }
+
+  function unlockVideos(){
+    if (userUnlocked) return;
+    userUnlocked = true;
+    hideUnlockUI();
+    setPageVideosActive(computeActiveIndex(), true);
+  }
+
+  function setPageVideosActive(activeIdx, fromGesture){
     pageEls.forEach((page, idx) => {
       const vids = Array.from(page.querySelectorAll('video.hero-video'));
       vids.forEach(v => {
         setInlineSafe(v);
         if (idx === activeIdx){
           v.preload = 'auto';
-          const p = v.play();
-          if (p && typeof p.catch === 'function') p.catch(() => {});
+          playVideo(v).catch(() => {
+            if (!fromGesture) showUnlockUI();
+          });
         } else {
           v.preload = 'none';
           try { v.pause(); } catch {}
         }
       });
     });
+    if (!fromGesture) {
+      setTimeout(checkActiveVideoPaused, 400);
+      setTimeout(checkActiveVideoPaused, 2000);
+    }
   }
 
-  let lastActive = -1;
   function computeActiveIndex(){
     return Math.max(0, Math.min(pageEls.length - 1, Math.round(pagesEl.scrollTop / pageHeight())));
   }
@@ -269,10 +316,34 @@ document.getElementById('calBtn').target = '_blank';
     const idx = computeActiveIndex();
     if (idx === lastActive) return;
     lastActive = idx;
-    setPageVideosActive(idx);
+    setPageVideosActive(idx, userUnlocked);
   }
 
-  // Initial and ongoing sync.
+  function onUserGesture(){
+    unlockVideos();
+    document.removeEventListener('touchstart', onUserGesture);
+    document.removeEventListener('click', onUserGesture);
+  }
+
+  overlayEl = document.createElement('button');
+  overlayEl.type = 'button';
+  overlayEl.className = 'video-unlock-overlay';
+  overlayEl.hidden = true;
+  overlayEl.setAttribute('aria-label', 'Tap to play background video');
+  overlayEl.innerHTML =
+    '<span class="video-unlock-icon" aria-hidden="true">' +
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' +
+    '</span><span class="video-unlock-label">Tap to continue</span>';
+  document.body.appendChild(overlayEl);
+  overlayEl.addEventListener('click', onUserGesture);
+
+  document.addEventListener('touchstart', onUserGesture, { passive: true });
+  document.addEventListener('click', onUserGesture);
+
+  document.querySelectorAll('video.hero-video').forEach(v => {
+    v.addEventListener('playing', hideUnlockUI);
+  });
+
   syncActive();
   pagesEl.addEventListener('scroll', () => requestAnimationFrame(syncActive), { passive: true });
   window.addEventListener('resize', () => requestAnimationFrame(syncActive));
