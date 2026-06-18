@@ -393,7 +393,8 @@ section{position:relative;z-index:1;padding:64px 22px}
 .venue-content{position:relative;z-index:1;max-width:920px;width:100%}
 .venue-content .reveal{max-width:430px}
 .venue-name{font-family:var(--display);font-size:26px;color:var(--ink);margin-top:2px}
-.venue-addr{color:var(--ink-soft);margin-top:8px;font-size:19px}
+.venue-addr{color:var(--ink-soft);margin-top:8px;font-size:19px;font-family:var(--display);font-weight:700}
+.venue-time{color:var(--coral-deep);margin-top:10px;font-size:19px;font-family:var(--display);font-weight:700}
 .ornament-left{justify-content:flex-start;margin-left:0}
 .ornament-left::before{display:none}
 
