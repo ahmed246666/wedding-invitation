@@ -378,6 +378,7 @@ if (isIOS) document.documentElement.classList.add('is-ios');
 
   function onUserGesture(){
     unlockVideos();
+    if (window.tryPlayAudio) window.tryPlayAudio();
     document.removeEventListener('touchstart', onUserGesture);
     document.removeEventListener('click', onUserGesture);
   }
@@ -476,7 +477,7 @@ if (isIOS) document.documentElement.classList.add('is-ios');
 
   const playIcon = btn.querySelector('.music-icon-play');
   const muteIcon = btn.querySelector('.music-icon-mute');
-  let isPlaying = true; // Playing by default
+  let isPlaying = false;
 
   function updateBtn(){
     if (isPlaying){
@@ -501,9 +502,8 @@ if (isIOS) document.documentElement.classList.add('is-ios');
         isPlaying = true;
         updateBtn();
         removeUnlockListeners();
-      }).catch(() => {
-        // Browser requires gesture — keep UI in intended playing state and await touch
-        isPlaying = true;
+      }).catch((err) => {
+        isPlaying = false;
         updateBtn();
       });
     }
@@ -518,7 +518,7 @@ if (isIOS) document.documentElement.classList.add('is-ios');
 
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (!audio.paused && isPlaying){
+    if (isPlaying && !audio.paused){
       pauseAudio();
     } else {
       playAudio();
@@ -547,24 +547,24 @@ if (isIOS) document.documentElement.classList.add('is-ios');
     playAudio();
   }
 
-  const unlockEvents = ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'click', 'scroll', 'keydown'];
+  const unlockEvents = ['touchstart', 'touchend', 'pointerdown', 'click'];
   function addUnlockListeners(){
     unlockEvents.forEach(evt => {
-      window.addEventListener(evt, onUserUnlock, { passive: true });
-      document.addEventListener(evt, onUserUnlock, { passive: true });
+      window.addEventListener(evt, onUserUnlock, { passive: true, capture: true });
+      document.addEventListener(evt, onUserUnlock, { passive: true, capture: true });
     });
   }
 
   function removeUnlockListeners(){
     unlockEvents.forEach(evt => {
-      window.removeEventListener(evt, onUserUnlock);
-      document.removeEventListener(evt, onUserUnlock);
+      window.removeEventListener(evt, onUserUnlock, { capture: true });
+      document.removeEventListener(evt, onUserUnlock, { capture: true });
     });
   }
 
   window.tryPlayAudio = playAudio;
 
-  // Initialize: default playing state
+  // Initialize
   updateBtn();
   addUnlockListeners();
   playAudio();
