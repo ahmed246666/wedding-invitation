@@ -40,7 +40,7 @@
 <body>
 
 <!-- Floating Background Music Toggle -->
-<button class="music-btn" id="musicBtn" type="button" aria-label="Toggle background music">
+<button class="music-btn playing" id="musicBtn" type="button" aria-label="Mute background music">
   <svg class="music-icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M9 18V5l12-2v13"></path>
     <circle cx="6" cy="18" r="3"></circle>
@@ -52,7 +52,7 @@
     <line x1="17" y1="9" x2="23" y2="15"></line>
   </svg>
 </button>
-<audio id="bgAudio" src="assets/media/audio.mp3" loop preload="auto"></audio>
+<audio id="bgAudio" src="assets/media/audio.mp3" autoplay loop preload="auto"></audio>
 
 <div class="pages" id="pages">
 

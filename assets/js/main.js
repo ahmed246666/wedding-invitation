@@ -476,7 +476,7 @@ if (isIOS) document.documentElement.classList.add('is-ios');
 
   const playIcon = btn.querySelector('.music-icon-play');
   const muteIcon = btn.querySelector('.music-icon-mute');
-  let isPlaying = false;
+  let isPlaying = true; // active by default
 
   function updateBtn(){
     if (isPlaying){
@@ -500,7 +500,8 @@ if (isIOS) document.documentElement.classList.add('is-ios');
         isPlaying = true;
         updateBtn();
       }).catch(() => {
-        isPlaying = false;
+        // In case browser blocks unmuted audio before user interaction
+        isPlaying = true;
         updateBtn();
       });
     }
@@ -515,31 +516,30 @@ if (isIOS) document.documentElement.classList.add('is-ios');
 
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (isPlaying){
+    if (isPlaying && !audio.paused){
       pauseAudio();
     } else {
       playAudio();
     }
   });
 
-  // Attempt auto-play on first user interaction anywhere on the page
-  function handleFirstGesture(){
-    if (!isPlaying){
+  // Automatically start playing on first user gesture anywhere
+  function handleGesturePlay(){
+    if (isPlaying && audio.paused){
       playAudio();
     }
-    document.removeEventListener('click', handleFirstGesture);
-    document.removeEventListener('touchstart', handleFirstGesture);
-    document.removeEventListener('scroll', handleFirstGesture);
   }
 
-  // Initial attempt
   audio.loop = true;
   audio.addEventListener('ended', () => {
     audio.currentTime = 0;
     playAudio();
   });
+
+  updateBtn();
   playAudio();
 
-  document.addEventListener('click', handleFirstGesture, { passive: true, once: true });
-  document.addEventListener('touchstart', handleFirstGesture, { passive: true, once: true });
+  ['click', 'touchstart', 'pointerdown', 'scroll', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, handleGesturePlay, { passive: true, once: true });
+  });
 })();
