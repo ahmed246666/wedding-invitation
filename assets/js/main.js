@@ -86,12 +86,11 @@ document.getElementById('calBtn').target = '_blank';
   function scheduleAutoScroll(delay = autoDelay){
     clearAutoTimer();
     if (!autoDelay || autoDelay <= 0 || userPaused) return;
+    if (cur >= pageEls.length - 1) return; // stay on last page (comments)
 
     autoTimer = setTimeout(() => {
-      if (!userPaused){
-        // Loop back to first page when reaching the end, repeating infinitely
-        const next = (cur + 1) % pageEls.length;
-        goTo(next);
+      if (!userPaused && cur < pageEls.length - 1){
+        goTo(cur + 1);
       }
     }, delay);
   }
@@ -133,6 +132,8 @@ document.getElementById('calBtn').target = '_blank';
     navUp.disabled  = cur === 0;
     navDown.disabled = cur === pageEls.length - 1;
     pageNavEl.classList.toggle('dark', DARK_PAGES.has(cur));
+    const musicBtnEl = document.getElementById('musicBtn');
+    if (musicBtnEl) musicBtnEl.classList.toggle('dark', DARK_PAGES.has(cur));
   }
 
   function goTo(n){
@@ -378,7 +379,6 @@ if (isIOS) document.documentElement.classList.add('is-ios');
 
   function onUserGesture(){
     unlockVideos();
-    if (window.tryPlayAudio) window.tryPlayAudio();
     document.removeEventListener('touchstart', onUserGesture);
     document.removeEventListener('click', onUserGesture);
   }
@@ -469,111 +469,62 @@ if (isIOS) document.documentElement.classList.add('is-ios');
   });
 })();
 
-/* ---------- BACKGROUND AUDIO CONTROLLER ---------- */
+/* ---------- BACKGROUND AUDIO MANAGER ---------- */
 (function(){
   const audio = document.getElementById('bgAudio');
-  const btn = document.getElementById('musicBtn');
+  const btn   = document.getElementById('musicBtn');
   if (!audio || !btn) return;
 
-  const playIcon = btn.querySelector('.music-icon-play');
-  const muteIcon = btn.querySelector('.music-icon-mute');
   let isPlaying = false;
+  let userManuallyToggled = false;
 
-  function updateBtn(){
-    if (isPlaying){
-      btn.classList.add('playing');
-      if (playIcon) playIcon.style.display = 'block';
-      if (muteIcon) muteIcon.style.display = 'none';
-      btn.setAttribute('aria-label', 'Mute background music');
-    } else {
-      btn.classList.remove('playing');
-      if (playIcon) playIcon.style.display = 'none';
-      if (muteIcon) muteIcon.style.display = 'block';
-      btn.setAttribute('aria-label', 'Play background music');
-    }
+  function updateBtnUI(playing){
+    isPlaying = playing;
+    btn.classList.toggle('is-playing', playing);
+    btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+    btn.setAttribute('title', playing ? 'Pause music' : 'Play music');
   }
 
   function playAudio(){
-    if (!audio) return;
-    audio.muted = false;
-    const playPromise = audio.play();
-    if (playPromise !== undefined){
-      playPromise.then(() => {
-        isPlaying = true;
-        updateBtn();
-        removeUnlockListeners();
-      }).catch((err) => {
-        isPlaying = false;
-        updateBtn();
+    const promise = audio.play();
+    if (promise !== undefined){
+      promise.then(() => {
+        updateBtnUI(true);
+      }).catch(() => {
+        updateBtnUI(false);
       });
     }
   }
 
   function pauseAudio(){
-    if (!audio) return;
     audio.pause();
-    isPlaying = false;
-    updateBtn();
+    updateBtnUI(false);
   }
 
-  btn.addEventListener('click', (e) => {
+  btn.addEventListener('click', e => {
     e.stopPropagation();
-    if (isPlaying && !audio.paused){
+    userManuallyToggled = true;
+    if (isPlaying){
       pauseAudio();
     } else {
       playAudio();
     }
   });
 
-  audio.addEventListener('play', () => {
-    isPlaying = true;
-    updateBtn();
-  });
-
-  audio.addEventListener('pause', () => {
-    if (audio.currentTime > 0 && !audio.ended && isPlaying === false) {
-      isPlaying = false;
-      updateBtn();
-    }
-  });
-
-  audio.loop = true;
-  audio.addEventListener('ended', () => {
-    audio.currentTime = 0;
-    playAudio();
-  });
-
-  function onUserUnlock(){
-    playAudio();
-  }
-
-  const unlockEvents = ['touchstart', 'touchend', 'pointerdown', 'click'];
-  function addUnlockListeners(){
-    unlockEvents.forEach(evt => {
-      window.addEventListener(evt, onUserUnlock, { passive: true, capture: true });
-      document.addEventListener(evt, onUserUnlock, { passive: true, capture: true });
-    });
-  }
-
-  function removeUnlockListeners(){
-    unlockEvents.forEach(evt => {
-      window.removeEventListener(evt, onUserUnlock, { capture: true });
-      document.removeEventListener(evt, onUserUnlock, { capture: true });
-    });
-  }
-
-  window.tryPlayAudio = playAudio;
-
-  // Initialize and play immediately on load
+  // Attempt auto-play on initial load
   playAudio();
-  window.addEventListener('DOMContentLoaded', playAudio);
-  window.addEventListener('load', playAudio);
-  window.addEventListener('pageshow', playAudio);
 
-  // Fallback intervals for fast-loading assets
-  setTimeout(playAudio, 100);
-  setTimeout(playAudio, 500);
-  setTimeout(playAudio, 1000);
+  // If autoplay was blocked by browser policy, play on first user interaction anywhere
+  function onFirstUserGesture(){
+    if (!isPlaying && !userManuallyToggled){
+      playAudio();
+    }
+    document.removeEventListener('click', onFirstUserGesture);
+    document.removeEventListener('touchstart', onFirstUserGesture);
+    document.removeEventListener('keydown', onFirstUserGesture);
+  }
 
-  addUnlockListeners();
+  document.addEventListener('click', onFirstUserGesture, { once: true });
+  document.addEventListener('touchstart', onFirstUserGesture, { once: true });
+  document.addEventListener('keydown', onFirstUserGesture, { once: true });
 })();

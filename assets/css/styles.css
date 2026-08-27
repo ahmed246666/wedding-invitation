@@ -729,15 +729,15 @@ footer .footer-date .date-sep{
 }
 
 /* ============================================================
-   FLOATING MUSIC PLAYER
+   MUSIC CONTROL BUTTON & EQUALIZER
    ============================================================ */
 .music-btn{
   position:fixed;
   top:24px;
   left:24px;
-  z-index:1002;
-  width:46px;
-  height:46px;
+  z-index:1000;
+  width:44px;
+  height:44px;
   border-radius:50%;
   border:1px solid var(--line);
   background:rgba(254,249,242,.92);
@@ -748,26 +748,62 @@ footer .footer-date .date-sep{
   display:flex;
   align-items:center;
   justify-content:center;
-  transition:background .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s;
-  box-shadow:0 6px 22px rgba(60,45,20,.18);
+  transition:background .22s, border-color .22s, color .22s, transform .22s, box-shadow .22s;
+  box-shadow:0 4px 20px rgba(0,0,0,.13);
+  -webkit-tap-highlight-color:transparent;
 }
 .music-btn:hover{
   background:var(--coral);
-  color:#fff;
   border-color:var(--coral);
+  color:#fff;
   transform:scale(1.1);
 }
-.music-btn.playing{
-  animation:musicPulse 2.2s infinite ease-in-out;
-  border-color:var(--coral);
+.music-btn.dark{
+  background:rgba(25,15,8,.72);
+  border-color:rgba(207,96,41,.38);
+  color:var(--coral);
 }
-.music-btn svg{
+.music-btn.dark:hover{
+  background:var(--coral);
+  border-color:var(--coral);
+  color:#fff;
+}
+
+/* Equalizer Bars */
+.music-bars{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:2.5px;
+  height:16px;
+  width:16px;
+}
+.music-btn.is-playing .music-bars{
+  display:flex;
+}
+.music-btn.is-playing .music-mute-icon{
+  display:none;
+}
+.music-bars .bar{
+  width:2.5px;
+  background:currentColor;
+  border-radius:2px;
+  animation:eqBar 1.2s ease-in-out infinite alternate;
+}
+.music-bars .bar-1{height:6px;animation-delay:0.1s}
+.music-bars .bar-2{height:14px;animation-delay:0.35s}
+.music-bars .bar-3{height:9px;animation-delay:0.55s}
+.music-bars .bar-4{height:12px;animation-delay:0.2s}
+
+@keyframes eqBar{
+  0%{transform:scaleY(0.3)}
+  100%{transform:scaleY(1.15)}
+}
+
+.music-mute-icon{
   width:20px;
   height:20px;
-}
-@keyframes musicPulse{
-  0%, 100%{ box-shadow:0 4px 18px rgba(207,96,41,.25); }
-  50%{ box-shadow:0 0 24px rgba(207,96,41,.55); transform:scale(1.04); }
+  display:block;
 }
 
 /* ============================================================
@@ -897,6 +933,8 @@ footer .footer-date .date-sep{
   .page-nav{right:12px}
   .page-nav-btn{width:38px;height:38px}
   .page-nav-btn svg{width:17px;height:17px}
+  .music-btn{top:16px;left:16px;width:38px;height:38px}
+  .music-mute-icon{width:17px;height:17px}
   .page .comments{padding:36px 18px 56px}
   .comments-wrap{max-width:none}
 }

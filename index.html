@@ -32,28 +32,12 @@
      ============================================================ -->
 <link rel="stylesheet" href="assets/css/styles.css" />
 
-<!-- preload hero video and background audio -->
+<!-- preload hero video for the current viewport -->
 <link rel="preload" as="video" href="assets/media/web_view.mp4" type="video/mp4" media="(min-width: 761px)" />
 <link rel="preload" as="video" href="assets/media/mobile_view.mp4" type="video/mp4" media="(max-width: 760px)" />
-<link rel="preload" as="fetch" href="assets/media/audio.mp3" crossorigin />
 </head>
 
 <body>
-
-<!-- Floating Background Music Toggle -->
-<button class="music-btn" id="musicBtn" type="button" aria-label="Toggle background music">
-  <svg class="music-icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M9 18V5l12-2v13"></path>
-    <circle cx="6" cy="18" r="3"></circle>
-    <circle cx="18" cy="16" r="3"></circle>
-  </svg>
-  <svg class="music-icon-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-    <line x1="23" y1="9" x2="17" y2="15"></line>
-    <line x1="17" y1="9" x2="23" y2="15"></line>
-  </svg>
-</button>
-<audio id="bgAudio" src="assets/media/audio.mp3" loop preload="auto" playsinline webkit-playsinline></audio>
 
 <div class="pages" id="pages">
 
@@ -203,6 +187,22 @@
   </div>
 
 </div><!-- /.pages -->
+
+<!-- ==================== BACKGROUND AUDIO ==================== -->
+<audio id="bgAudio" src="assets/media/audio.mp3" loop preload="auto"></audio>
+<button class="music-btn dark" id="musicBtn" aria-label="Toggle background music" title="Toggle background music">
+  <span class="music-bars" aria-hidden="true">
+    <span class="bar bar-1"></span>
+    <span class="bar bar-2"></span>
+    <span class="bar bar-3"></span>
+    <span class="bar bar-4"></span>
+  </span>
+  <svg class="music-mute-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+    <line x1="23" y1="9" x2="17" y2="15"></line>
+    <line x1="17" y1="9" x2="23" y2="15"></line>
+  </svg>
+</button>
 
 <!-- ==================== PAGE NAVIGATION ==================== -->
 <nav class="page-nav dark" id="pageNav" aria-label="Page navigation">
