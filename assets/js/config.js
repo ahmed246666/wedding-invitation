@@ -2,21 +2,21 @@
    CONFIG  — edit everything here
    ============================================================ */
 const CONFIG = {
-  // Katb Ketab date & time (local). Format: YEAR, MONTH(1-12), DAY, HOUR(24), MIN
-  date: { year:2026, month:6, day:26, hour:16, minute:30 },
+  // Wedding date & time (local). Format: YEAR, MONTH(1-12), DAY, HOUR(24), MIN
+  date: { year:2026, month:9, day:21, hour:20, minute:0 },
   // event duration in hours (for calendar)
-  durationHours: 1.5,
+  durationHours: 4,
   // Venue
   venue: {
-    name:"Al-Iman Mosque",
-    address:"Kanat Al Sweis, Mansoura Qism 2, El Mansoura, Egypt",
+    name:"Olivia Hall - قاعة أوليفيا",
+    address:"Talkha, Mansoura, Egypt (طلخا، المنصورة)",
     // paste your Google Maps link here (Share → Copy link)
-    mapsUrl:"https://maps.app.goo.gl/erNueTmoqtQAT7cA8"
+    mapsUrl:"https://maps.app.goo.gl/kbUDTVFXLdouyDHL8"
   },
   // calendar event title
-  calendarTitle:"Katb Ketab of Alaa and Mohamed",
+  calendarTitle:"Wedding of Ahmed and Shorouk - حفل زفاف أحمد وشروق",
   // Google Apps Script web app URL (see scripts/comments-apps-script.gs)
-  commentsScriptUrl:"https://script.google.com/macros/s/AKfycbxtHkm-99PuewElGPBFFlbt-VOvzoVf_9SwZmjGiR6Yn8eXr3Bo_0y3XNwC6kYIMsLMkQ/exec",
+  commentsScriptUrl:"https://script.google.com/macros/s/AKfycbysNoel2gza85GidCXVSoA5lOSuy5Ci-FGOjRcGXApO4e9tILY5-Iohu7i_7Gq0mXf5dA/exec",
   // optional shared secret — must match SECRET in the Apps Script
   commentsSecret:""
 };

@@ -1,11 +1,11 @@
-# Katb Ketab Invitation
+# Wedding Invitation
 
-An elegant digital katb ketab invitation. The project is split into clean, separate files so markup, styles, and logic are easy to edit independently.
+An elegant digital wedding invitation. The project is split into clean, separate files so markup, styles, and logic are easy to edit independently.
 
 ## Project structure
 
 ```
-katb-ketab/
+wedding/
 ├── index.html              # Page markup only
 ├── README.md
 └── assets/
@@ -18,7 +18,7 @@ katb-ketab/
         ├── web_view.mp4      # Hero / split-section background (desktop)
         ├── mobile_view.mp4   # Hero / split-section background (mobile)
         ├── allahm.png        # Arabic blessing calligraphy
-        └── image.png         # Venue photo
+        └── venue.jpeg        # Venue photo (Olivia Hall)
 ```
 
 ## What's inside
@@ -30,7 +30,7 @@ katb-ketab/
 
 ## How to edit
 1. **Details** — almost everything lives in **`assets/js/config.js`**:
-   - `date` — katb ketab date & time
+   - `date` — wedding date & time
    - `durationHours` — event length (used for the calendar event)
    - `venue.name` / `venue.address` / `venue.mapsUrl`
    - `calendarTitle` — the calendar event title
