@@ -30,7 +30,7 @@
 <!-- ============================================================
      STYLES
      ============================================================ -->
-<link rel="stylesheet" href="assets/css/styles.css?v=2.0" />
+<link rel="stylesheet" href="assets/css/styles.css" />
 
 <!-- preload hero video for the current viewport -->
 <link rel="preload" as="video" href="assets/media/web_view.mp4" type="video/mp4" media="(min-width: 761px)" />
@@ -39,7 +39,20 @@
 
 <body>
 
-<audio id="bgAudio" src="assets/media/audio.mp3" autoplay loop preload="auto" playsinline webkit-playsinline></audio>
+<!-- Floating Background Music Toggle -->
+<button class="music-btn" id="musicBtn" type="button" aria-label="Toggle background music">
+  <svg class="music-icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V5l12-2v13"></path>
+    <circle cx="6" cy="18" r="3"></circle>
+    <circle cx="18" cy="16" r="3"></circle>
+  </svg>
+  <svg class="music-icon-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+    <line x1="23" y1="9" x2="17" y2="15"></line>
+    <line x1="17" y1="9" x2="23" y2="15"></line>
+  </svg>
+</button>
+<audio id="bgAudio" src="assets/media/audio.mp3" loop autoplay preload="auto"></audio>
 
 <div class="pages" id="pages">
 
@@ -205,7 +218,7 @@
   </button>
 </nav>
 
-<script src="assets/js/config.js?v=3.0"></script>
-<script src="assets/js/main.js?v=3.0"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>

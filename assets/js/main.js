@@ -341,7 +341,6 @@ if (isIOS) document.documentElement.classList.add('is-ios');
     userUnlocked = true;
     hideUnlockUI();
     setPageVideosActive(computeActiveIndex(), true);
-    if (window.tryPlayAudio) window.tryPlayAudio();
   }
 
   function setPageVideosActive(activeIdx, fromGesture){
@@ -469,51 +468,104 @@ if (isIOS) document.documentElement.classList.add('is-ios');
   });
 })();
 
-/* ---------- BACKGROUND AUDIO (UNMUTED MOBILE AUTOPLAY) ---------- */
+/* ---------- BACKGROUND AUDIO CONTROLLER ---------- */
 (function(){
   const audio = document.getElementById('bgAudio');
-  if (!audio) return;
+  const btn = document.getElementById('musicBtn');
+  if (!audio || !btn) return;
 
-  function tryPlay(){
+  const playIcon = btn.querySelector('.music-icon-play');
+  const muteIcon = btn.querySelector('.music-icon-mute');
+  let isPlaying = true; // Playing by default
+
+  function updateBtn(){
+    if (isPlaying){
+      btn.classList.add('playing');
+      if (playIcon) playIcon.style.display = 'block';
+      if (muteIcon) muteIcon.style.display = 'none';
+      btn.setAttribute('aria-label', 'Mute background music');
+    } else {
+      btn.classList.remove('playing');
+      if (playIcon) playIcon.style.display = 'none';
+      if (muteIcon) muteIcon.style.display = 'block';
+      btn.setAttribute('aria-label', 'Play background music');
+    }
+  }
+
+  function playAudio(){
     if (!audio) return;
+    audio.muted = false;
     const playPromise = audio.play();
     if (playPromise !== undefined){
       playPromise.then(() => {
-        // Audio is actively playing!
-        removeMobileListeners();
+        isPlaying = true;
+        updateBtn();
+        removeUnlockListeners();
       }).catch(() => {
-        // Still awaiting user gesture, listeners stay attached
+        // Browser requires gesture — keep UI in intended playing state and await touch
+        isPlaying = true;
+        updateBtn();
       });
     }
   }
 
+  function pauseAudio(){
+    if (!audio) return;
+    audio.pause();
+    isPlaying = false;
+    updateBtn();
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!audio.paused && isPlaying){
+      pauseAudio();
+    } else {
+      playAudio();
+    }
+  });
+
+  audio.addEventListener('play', () => {
+    isPlaying = true;
+    updateBtn();
+  });
+
+  audio.addEventListener('pause', () => {
+    if (audio.currentTime > 0 && !audio.ended && isPlaying === false) {
+      isPlaying = false;
+      updateBtn();
+    }
+  });
+
   audio.loop = true;
   audio.addEventListener('ended', () => {
     audio.currentTime = 0;
-    tryPlay();
+    playAudio();
   });
 
-  function onUserTouch(){
-    tryPlay();
+  function onUserUnlock(){
+    playAudio();
   }
 
-  const touchEvents = ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'click', 'scroll'];
-  function addMobileListeners(){
-    touchEvents.forEach(evt => {
-      window.addEventListener(evt, onUserTouch, { passive: true });
-      document.addEventListener(evt, onUserTouch, { passive: true });
+  const unlockEvents = ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'click', 'scroll', 'keydown'];
+  function addUnlockListeners(){
+    unlockEvents.forEach(evt => {
+      window.addEventListener(evt, onUserUnlock, { passive: true });
+      document.addEventListener(evt, onUserUnlock, { passive: true });
     });
   }
 
-  function removeMobileListeners(){
-    touchEvents.forEach(evt => {
-      window.removeEventListener(evt, onUserTouch);
-      document.removeEventListener(evt, onUserTouch);
+  function removeUnlockListeners(){
+    unlockEvents.forEach(evt => {
+      window.removeEventListener(evt, onUserUnlock);
+      document.removeEventListener(evt, onUserUnlock);
     });
   }
 
-  window.tryPlayAudio = tryPlay;
+  window.tryPlayAudio = playAudio;
 
-  addMobileListeners();
-  tryPlay();
+  // Initialize: default playing state
+  updateBtn();
+  addUnlockListeners();
+  playAudio();
 })();

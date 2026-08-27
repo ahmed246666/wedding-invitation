@@ -729,6 +729,48 @@ footer .footer-date .date-sep{
 }
 
 /* ============================================================
+   FLOATING MUSIC PLAYER
+   ============================================================ */
+.music-btn{
+  position:fixed;
+  top:24px;
+  left:24px;
+  z-index:1002;
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:rgba(254,249,242,.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  color:var(--coral-deep);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s;
+  box-shadow:0 6px 22px rgba(60,45,20,.18);
+}
+.music-btn:hover{
+  background:var(--coral);
+  color:#fff;
+  border-color:var(--coral);
+  transform:scale(1.1);
+}
+.music-btn.playing{
+  animation:musicPulse 2.2s infinite ease-in-out;
+  border-color:var(--coral);
+}
+.music-btn svg{
+  width:20px;
+  height:20px;
+}
+@keyframes musicPulse{
+  0%, 100%{ box-shadow:0 4px 18px rgba(207,96,41,.25); }
+  50%{ box-shadow:0 0 24px rgba(207,96,41,.55); transform:scale(1.04); }
+}
+
+/* ============================================================
    PAGE NAVIGATION (fixed right side)
    ============================================================ */
 .page-nav{
