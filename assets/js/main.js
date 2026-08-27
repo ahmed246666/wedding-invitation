@@ -132,8 +132,6 @@ document.getElementById('calBtn').target = '_blank';
     navUp.disabled  = cur === 0;
     navDown.disabled = cur === pageEls.length - 1;
     pageNavEl.classList.toggle('dark', DARK_PAGES.has(cur));
-    const musicBtnEl = document.getElementById('musicBtn');
-    if (musicBtnEl) musicBtnEl.classList.toggle('dark', DARK_PAGES.has(cur));
   }
 
   function goTo(n){
@@ -469,62 +467,32 @@ if (isIOS) document.documentElement.classList.add('is-ios');
   });
 })();
 
-/* ---------- BACKGROUND AUDIO MANAGER ---------- */
+/* ---------- BACKGROUND AUDIO (AUTO-PLAY FROM START) ---------- */
 (function(){
   const audio = document.getElementById('bgAudio');
-  const btn   = document.getElementById('musicBtn');
-  if (!audio || !btn) return;
+  if (!audio) return;
 
-  let isPlaying = false;
-  let userManuallyToggled = false;
-
-  function updateBtnUI(playing){
-    isPlaying = playing;
-    btn.classList.toggle('is-playing', playing);
-    btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
-    btn.setAttribute('title', playing ? 'Pause music' : 'Play music');
-  }
-
-  function playAudio(){
-    const promise = audio.play();
-    if (promise !== undefined){
-      promise.then(() => {
-        updateBtnUI(true);
-      }).catch(() => {
-        updateBtnUI(false);
+  function startAudio(){
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise !== undefined){
+      playPromise.catch(() => {
+        // If autoplay is blocked by browser policy, start from beginning on first user interaction
+        function onFirstGesture(){
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+          ['click', 'touchstart', 'scroll', 'keydown', 'wheel'].forEach(evt => {
+            window.removeEventListener(evt, onFirstGesture);
+            document.removeEventListener(evt, onFirstGesture);
+          });
+        }
+        ['click', 'touchstart', 'scroll', 'keydown', 'wheel'].forEach(evt => {
+          window.addEventListener(evt, onFirstGesture, { once: true, passive: true });
+          document.addEventListener(evt, onFirstGesture, { once: true, passive: true });
+        });
       });
     }
   }
 
-  function pauseAudio(){
-    audio.pause();
-    updateBtnUI(false);
-  }
-
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    userManuallyToggled = true;
-    if (isPlaying){
-      pauseAudio();
-    } else {
-      playAudio();
-    }
-  });
-
-  // Attempt auto-play on initial load
-  playAudio();
-
-  // If autoplay was blocked by browser policy, play on first user interaction anywhere
-  function onFirstUserGesture(){
-    if (!isPlaying && !userManuallyToggled){
-      playAudio();
-    }
-    document.removeEventListener('click', onFirstUserGesture);
-    document.removeEventListener('touchstart', onFirstUserGesture);
-    document.removeEventListener('keydown', onFirstUserGesture);
-  }
-
-  document.addEventListener('click', onFirstUserGesture, { once: true });
-  document.addEventListener('touchstart', onFirstUserGesture, { once: true });
-  document.addEventListener('keydown', onFirstUserGesture, { once: true });
+  startAudio();
 })();
