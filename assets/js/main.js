@@ -341,6 +341,7 @@ if (isIOS) document.documentElement.classList.add('is-ios');
     userUnlocked = true;
     hideUnlockUI();
     setPageVideosActive(computeActiveIndex(), true);
+    if (window.tryPlayAudio) window.tryPlayAudio();
   }
 
   function setPageVideosActive(activeIdx, fromGesture){
@@ -468,35 +469,51 @@ if (isIOS) document.documentElement.classList.add('is-ios');
   });
 })();
 
-/* ---------- BACKGROUND AUDIO (UNMUTED AUTOPLAY) ---------- */
+/* ---------- BACKGROUND AUDIO (UNMUTED MOBILE AUTOPLAY) ---------- */
 (function(){
   const audio = document.getElementById('bgAudio');
   if (!audio) return;
 
-  function playAudio(){
+  function tryPlay(){
+    if (!audio) return;
     const playPromise = audio.play();
     if (playPromise !== undefined){
-      playPromise.catch(() => {});
+      playPromise.then(() => {
+        // Audio is actively playing!
+        removeMobileListeners();
+      }).catch(() => {
+        // Still awaiting user gesture, listeners stay attached
+      });
     }
   }
 
   audio.loop = true;
   audio.addEventListener('ended', () => {
     audio.currentTime = 0;
-    playAudio();
+    tryPlay();
   });
 
-  // Try immediate autoplay
-  playAudio();
-
-  // Guarantee playback starts on the very first user interaction
-  function handleGesture(){
-    if (audio.paused){
-      playAudio();
-    }
+  function onUserTouch(){
+    tryPlay();
   }
 
-  ['click', 'touchstart', 'pointerdown', 'scroll', 'keydown'].forEach(evt => {
-    document.addEventListener(evt, handleGesture, { passive: true, once: true });
-  });
+  const touchEvents = ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'click', 'scroll'];
+  function addMobileListeners(){
+    touchEvents.forEach(evt => {
+      window.addEventListener(evt, onUserTouch, { passive: true });
+      document.addEventListener(evt, onUserTouch, { passive: true });
+    });
+  }
+
+  function removeMobileListeners(){
+    touchEvents.forEach(evt => {
+      window.removeEventListener(evt, onUserTouch);
+      document.removeEventListener(evt, onUserTouch);
+    });
+  }
+
+  window.tryPlayAudio = tryPlay;
+
+  addMobileListeners();
+  tryPlay();
 })();
