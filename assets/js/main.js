@@ -466,3 +466,74 @@ if (isIOS) document.documentElement.classList.add('is-ios');
     }
   });
 })();
+
+/* ---------- BACKGROUND AUDIO CONTROLLER ---------- */
+(function(){
+  const audio = document.getElementById('bgAudio');
+  const btn = document.getElementById('musicBtn');
+  if (!audio || !btn) return;
+
+  const playIcon = btn.querySelector('.music-icon-play');
+  const muteIcon = btn.querySelector('.music-icon-mute');
+  let isPlaying = false;
+
+  function updateBtn(){
+    if (isPlaying){
+      btn.classList.add('playing');
+      if (playIcon) playIcon.style.display = 'block';
+      if (muteIcon) muteIcon.style.display = 'none';
+      btn.setAttribute('aria-label', 'Mute background music');
+    } else {
+      btn.classList.remove('playing');
+      if (playIcon) playIcon.style.display = 'none';
+      if (muteIcon) muteIcon.style.display = 'block';
+      btn.setAttribute('aria-label', 'Play background music');
+    }
+  }
+
+  function playAudio(){
+    if (!audio) return;
+    const playPromise = audio.play();
+    if (playPromise !== undefined){
+      playPromise.then(() => {
+        isPlaying = true;
+        updateBtn();
+      }).catch(() => {
+        isPlaying = false;
+        updateBtn();
+      });
+    }
+  }
+
+  function pauseAudio(){
+    if (!audio) return;
+    audio.pause();
+    isPlaying = false;
+    updateBtn();
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (isPlaying){
+      pauseAudio();
+    } else {
+      playAudio();
+    }
+  });
+
+  // Attempt auto-play on first user interaction anywhere on the page
+  function handleFirstGesture(){
+    if (!isPlaying){
+      playAudio();
+    }
+    document.removeEventListener('click', handleFirstGesture);
+    document.removeEventListener('touchstart', handleFirstGesture);
+    document.removeEventListener('scroll', handleFirstGesture);
+  }
+
+  // Initial attempt
+  playAudio();
+
+  document.addEventListener('click', handleFirstGesture, { passive: true, once: true });
+  document.addEventListener('touchstart', handleFirstGesture, { passive: true, once: true });
+})();
