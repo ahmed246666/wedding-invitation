@@ -468,65 +468,15 @@ if (isIOS) document.documentElement.classList.add('is-ios');
   });
 })();
 
-/* ---------- BACKGROUND AUDIO CONTROLLER ---------- */
+/* ---------- BACKGROUND AUDIO (UNMUTED AUTOPLAY) ---------- */
 (function(){
   const audio = document.getElementById('bgAudio');
-  const btn = document.getElementById('musicBtn');
-  if (!audio || !btn) return;
-
-  const playIcon = btn.querySelector('.music-icon-play');
-  const muteIcon = btn.querySelector('.music-icon-mute');
-  let isPlaying = true; // active by default
-
-  function updateBtn(){
-    if (isPlaying){
-      btn.classList.add('playing');
-      if (playIcon) playIcon.style.display = 'block';
-      if (muteIcon) muteIcon.style.display = 'none';
-      btn.setAttribute('aria-label', 'Mute background music');
-    } else {
-      btn.classList.remove('playing');
-      if (playIcon) playIcon.style.display = 'none';
-      if (muteIcon) muteIcon.style.display = 'block';
-      btn.setAttribute('aria-label', 'Play background music');
-    }
-  }
+  if (!audio) return;
 
   function playAudio(){
-    if (!audio) return;
     const playPromise = audio.play();
     if (playPromise !== undefined){
-      playPromise.then(() => {
-        isPlaying = true;
-        updateBtn();
-      }).catch(() => {
-        // In case browser blocks unmuted audio before user interaction
-        isPlaying = true;
-        updateBtn();
-      });
-    }
-  }
-
-  function pauseAudio(){
-    if (!audio) return;
-    audio.pause();
-    isPlaying = false;
-    updateBtn();
-  }
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (isPlaying && !audio.paused){
-      pauseAudio();
-    } else {
-      playAudio();
-    }
-  });
-
-  // Automatically start playing on first user gesture anywhere
-  function handleGesturePlay(){
-    if (isPlaying && audio.paused){
-      playAudio();
+      playPromise.catch(() => {});
     }
   }
 
@@ -536,10 +486,17 @@ if (isIOS) document.documentElement.classList.add('is-ios');
     playAudio();
   });
 
-  updateBtn();
+  // Try immediate autoplay
   playAudio();
 
+  // Guarantee playback starts on the very first user interaction
+  function handleGesture(){
+    if (audio.paused){
+      playAudio();
+    }
+  }
+
   ['click', 'touchstart', 'pointerdown', 'scroll', 'keydown'].forEach(evt => {
-    document.addEventListener(evt, handleGesturePlay, { passive: true, once: true });
+    document.addEventListener(evt, handleGesture, { passive: true, once: true });
   });
 })();
