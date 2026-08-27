@@ -70,12 +70,54 @@ document.getElementById('calBtn').target = '_blank';
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const smoothScroll = !reducedMotion && 'scrollBehavior' in document.documentElement.style;
 
+  /* ---------- AUTO SCROLL ---------- */
+  const autoDelay = typeof CONFIG.autoScrollDelay === 'number' ? CONFIG.autoScrollDelay : 5500;
+  let autoTimer = null;
+  let userPaused = false;
+  let resumeTimer = null;
+
+  function clearAutoTimer(){
+    if (autoTimer) {
+      clearTimeout(autoTimer);
+      autoTimer = null;
+    }
+  }
+
+  function scheduleAutoScroll(delay = autoDelay){
+    clearAutoTimer();
+    if (!autoDelay || autoDelay <= 0 || userPaused) return;
+    if (cur >= pageEls.length - 1) return; // stay on last page (comments)
+
+    autoTimer = setTimeout(() => {
+      if (!userPaused && cur < pageEls.length - 1){
+        goTo(cur + 1);
+      }
+    }, delay);
+  }
+
+  function handleUserInteraction(){
+    userPaused = true;
+    clearAutoTimer();
+    if (resumeTimer) clearTimeout(resumeTimer);
+    // Resume auto-scroll after 14 seconds of inactivity if not typing
+    resumeTimer = setTimeout(() => {
+      const activeTag = document.activeElement ? document.activeElement.tagName : '';
+      if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA'){
+        userPaused = false;
+        scheduleAutoScroll(autoDelay);
+      }
+    }, 14000);
+  }
+
   /* build dot buttons */
   pageEls.forEach((_, i) => {
     const btn = document.createElement('button');
     btn.className = 'page-dot';
     btn.setAttribute('aria-label', `Page ${i + 1}`);
-    btn.addEventListener('click', () => goTo(i));
+    btn.addEventListener('click', () => {
+      handleUserInteraction();
+      goTo(i);
+    });
     dotsEl.appendChild(btn);
   });
 
@@ -100,10 +142,13 @@ document.getElementById('calBtn').target = '_blank';
     else pagesEl.scrollTop = top;
     sync();
     revealPage(n);
+    if (!userPaused) {
+      scheduleAutoScroll();
+    }
   }
 
-  navUp.addEventListener('click',   () => goTo(cur - 1));
-  navDown.addEventListener('click', () => goTo(cur + 1));
+  navUp.addEventListener('click',   () => { handleUserInteraction(); goTo(cur - 1); });
+  navDown.addEventListener('click', () => { handleUserInteraction(); goTo(cur + 1); });
 
   /* keep state in sync when user scrolls with trackpad / touch */
   let ticking = false;
@@ -120,17 +165,28 @@ document.getElementById('calBtn').target = '_blank';
       });
       ticking = true;
     }
+  }, { passive: true });
+
+  pagesEl.addEventListener('wheel', handleUserInteraction, { passive: true });
+  pagesEl.addEventListener('touchstart', handleUserInteraction, { passive: true });
+
+  document.querySelectorAll('input, textarea').forEach(input => {
+    input.addEventListener('focus', () => {
+      userPaused = true;
+      clearAutoTimer();
+    });
   });
 
   /* keyboard navigation */
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowDown' || e.key === 'PageDown'){ e.preventDefault(); goTo(cur + 1); }
-    if (e.key === 'ArrowUp'   || e.key === 'PageUp')  { e.preventDefault(); goTo(cur - 1); }
+    if (e.key === 'ArrowDown' || e.key === 'PageDown'){ e.preventDefault(); handleUserInteraction(); goTo(cur + 1); }
+    if (e.key === 'ArrowUp'   || e.key === 'PageUp')  { e.preventDefault(); handleUserInteraction(); goTo(cur - 1); }
   });
 
   /* initialise */
   sync();
   revealPage(0);
+  scheduleAutoScroll(6000); // start auto scroll after 6s on initial hero
 })();
 
 /* ---------- iOS detect (blend-mode fix + video unlock UI) ---------- */

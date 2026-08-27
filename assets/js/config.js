@@ -18,5 +18,7 @@ const CONFIG = {
   // Google Apps Script web app URL (see scripts/comments-apps-script.gs)
   commentsScriptUrl:"https://script.google.com/macros/s/AKfycbysNoel2gza85GidCXVSoA5lOSuy5Ci-FGOjRcGXApO4e9tILY5-Iohu7i_7Gq0mXf5dA/exec",
   // optional shared secret — must match SECRET in the Apps Script
-  commentsSecret:""
+  commentsSecret:"",
+  // Auto-scroll time per section in milliseconds (0 to disable)
+  autoScrollDelay: 5500
 };
