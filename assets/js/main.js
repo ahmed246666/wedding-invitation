@@ -86,11 +86,12 @@ document.getElementById('calBtn').target = '_blank';
   function scheduleAutoScroll(delay = autoDelay){
     clearAutoTimer();
     if (!autoDelay || autoDelay <= 0 || userPaused) return;
-    if (cur >= pageEls.length - 1) return; // stay on last page (comments)
 
     autoTimer = setTimeout(() => {
-      if (!userPaused && cur < pageEls.length - 1){
-        goTo(cur + 1);
+      if (!userPaused){
+        // Loop back to first page when reaching the end, repeating infinitely
+        const next = (cur + 1) % pageEls.length;
+        goTo(next);
       }
     }, delay);
   }
@@ -532,6 +533,11 @@ if (isIOS) document.documentElement.classList.add('is-ios');
   }
 
   // Initial attempt
+  audio.loop = true;
+  audio.addEventListener('ended', () => {
+    audio.currentTime = 0;
+    playAudio();
+  });
   playAudio();
 
   document.addEventListener('click', handleFirstGesture, { passive: true, once: true });
