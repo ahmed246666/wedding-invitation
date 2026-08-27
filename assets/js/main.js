@@ -186,7 +186,12 @@ document.getElementById('calBtn').target = '_blank';
   /* initialise */
   sync();
   revealPage(0);
-  scheduleAutoScroll(6000); // start auto scroll after 6s on initial hero
+
+  window.__startAutoScroll = scheduleAutoScroll;
+  // If gate exists, wait for user to open it before auto-scrolling
+  if (!document.getElementById('invitationGate')){
+    scheduleAutoScroll(6000);
+  }
 })();
 
 /* ---------- iOS detect (blend-mode fix + video unlock UI) ---------- */
@@ -467,32 +472,46 @@ if (isIOS) document.documentElement.classList.add('is-ios');
   });
 })();
 
-/* ---------- BACKGROUND AUDIO (AUTO-PLAY FROM START) ---------- */
+/* ---------- INVITATION GATE & BACKGROUND AUDIO ---------- */
 (function(){
-  const audio = document.getElementById('bgAudio');
-  if (!audio) return;
+  const gate    = document.getElementById('invitationGate');
+  const openBtn = document.getElementById('openInviteBtn');
+  const audio   = document.getElementById('bgAudio');
 
-  function startAudio(){
-    audio.currentTime = 0;
-    const playPromise = audio.play();
-    if (playPromise !== undefined){
-      playPromise.catch(() => {
-        // If autoplay is blocked by browser policy, start from beginning on first user interaction
-        function onFirstGesture(){
-          audio.currentTime = 0;
-          audio.play().catch(() => {});
-          ['click', 'touchstart', 'scroll', 'keydown', 'wheel'].forEach(evt => {
-            window.removeEventListener(evt, onFirstGesture);
-            document.removeEventListener(evt, onFirstGesture);
-          });
-        }
-        ['click', 'touchstart', 'scroll', 'keydown', 'wheel'].forEach(evt => {
-          window.addEventListener(evt, onFirstGesture, { once: true, passive: true });
-          document.addEventListener(evt, onFirstGesture, { once: true, passive: true });
-        });
-      });
+  let opened = false;
+
+  function openInvitation(){
+    if (opened) return;
+    opened = true;
+
+    // Start Audio from the beginning
+    if (audio){
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+
+    // Unlock gate animation
+    if (gate){
+      gate.classList.add('is-opened');
+      setTimeout(() => {
+        gate.style.display = 'none';
+      }, 950);
+    }
+
+    // Start auto-scroll after opening
+    if (typeof window.__startAutoScroll === 'function'){
+      window.__startAutoScroll(6500);
     }
   }
 
-  startAudio();
+  if (openBtn){
+    openBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      openInvitation();
+    });
+  }
+
+  if (gate){
+    gate.addEventListener('click', openInvitation);
+  }
 })();
