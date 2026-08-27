@@ -564,8 +564,16 @@ if (isIOS) document.documentElement.classList.add('is-ios');
 
   window.tryPlayAudio = playAudio;
 
-  // Initialize
-  updateBtn();
-  addUnlockListeners();
+  // Initialize and play immediately on load
   playAudio();
+  window.addEventListener('DOMContentLoaded', playAudio);
+  window.addEventListener('load', playAudio);
+  window.addEventListener('pageshow', playAudio);
+
+  // Fallback intervals for fast-loading assets
+  setTimeout(playAudio, 100);
+  setTimeout(playAudio, 500);
+  setTimeout(playAudio, 1000);
+
+  addUnlockListeners();
 })();
