@@ -1,6 +1,6 @@
-# Wedding Invitation
+# Katb Ketab Invitation
 
-An elegant digital wedding invitation. The project is split into clean, separate files so markup, styles, and logic are easy to edit independently.
+An elegant digital Katb Ketab invitation. The project is split into clean, separate files so markup, styles, and logic are easy to edit independently.
 
 ## Project structure
 
@@ -18,7 +18,7 @@ wedding/
         ├── web_view.mp4      # Hero / split-section background (desktop)
         ├── mobile_view.mp4   # Hero / split-section background (mobile)
         ├── allahm.png        # Arabic blessing calligraphy
-        └── venue.jpeg        # Venue photo (Olivia Hall)
+        └── venue.jpeg        # Venue photo (Villa V)
 ```
 
 ## What's inside
