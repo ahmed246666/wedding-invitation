@@ -63,8 +63,8 @@ document.getElementById('calBtn').target = '_blank';
   const dotsEl    = document.getElementById('pageDots');
   const pageNavEl = document.getElementById('pageNav');
 
-  /* pages 0 (hero) and 1 (split) have dark backgrounds */
-  const DARK_PAGES = new Set([0, 1]);
+  /* all pages now have light baby-blue backgrounds */
+  const DARK_PAGES = new Set();
 
   let cur = 0;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
